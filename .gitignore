@@ -1,0 +1,70 @@
+.idea/
+# IntelliJ
+out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+### Symfony ###
+# Cache and logs (Symfony2)
+/app/cache/*
+/app/logs/*
+!app/cache/.gitkeep
+!app/logs/.gitkeep
+
+# Cache, session files and logs (Symfony3)
+/var/cache/*
+/var/logs/*
+/var/sessions/*
+!var/cache/.gitkeep
+!var/logs/.gitkeep
+!var/sessions/.gitkeep
+
+# Logs (Symfony4)
+/var/log/*
+!var/log/.gitkeep
+
+# Managed by Composer
+/app/bootstrap.php.cache
+/var/bootstrap.php.cache
+/bin/*
+!bin/console
+!bin/symfony_requirements
+/vendor/
+
+# Assets and user uploads
+/web/bundles/
+/web/uploads/
+
+# PHPUnit
+/app/phpunit.xml
+/phpunit.xml
+
+# Build data
+/build/
+
+# Composer PHAR
+/composer.phar
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+###< symfony/framework-bundle ###
+
+/public/uploads/*
+!/public/uploads/.gitignore
