@@ -27,6 +27,7 @@
                             <input type="password" class="form-control" id="password" name="_password" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Connexion</button>
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                     </form>
                 </div>
             </nav>
