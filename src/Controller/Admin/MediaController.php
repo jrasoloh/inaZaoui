@@ -11,6 +11,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MediaController extends AbstractController
 {
+    private const PER_PAGE = 25;
+
     public function __construct(private readonly ManagerRegistry $managerRegistry)
     {
     }
@@ -18,7 +20,7 @@ class MediaController extends AbstractController
     #[Route('/admin/media', name: 'admin_media_index')]
     public function index(Request $request)
     {
-        $page = $request->query->getInt('page', 1);
+        $page = max(1, $request->query->getInt('page', 1));
 
         $criteria = [];
 
@@ -26,18 +28,20 @@ class MediaController extends AbstractController
             $criteria['user'] = $this->getUser();
         }
 
-        $medias = $this->managerRegistry->getRepository(Media::class)->findBy(
+        $repository = $this->managerRegistry->getRepository(Media::class);
+        $medias = $repository->findBy(
             $criteria,
             ['id' => 'ASC'],
-            25,
-            25 * ($page - 1)
+            self::PER_PAGE,
+            self::PER_PAGE * ($page - 1)
         );
-        $total = $this->managerRegistry->getRepository(Media::class)->count([]);
+        $total = $repository->count($criteria);
 
         return $this->render('admin/media/index.html.twig', [
             'medias' => $medias,
             'total' => $total,
-            'page' => $page
+            'page' => $page,
+            'perPage' => self::PER_PAGE
         ]);
     }
 
