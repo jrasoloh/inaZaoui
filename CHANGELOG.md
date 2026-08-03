@@ -21,6 +21,14 @@ Résolution des anomalies de l'application (brief : vérification des fichiers u
   - Script de test `scripts/test-upload.sh` (non-image → rejeté 200 + message ; image valide → acceptée 302).
 - **Validation** : test automatisé OK + upload réel vérifié en navigateur.
 
+### ✅ Durcissement du stockage des uploads (`src/Service/MediaUploader.php`, `services.yaml`, `MediaController`)
+- **Problème** : `MediaController` utilisait un chemin **relatif** (`move('uploads/', …)` et `unlink($media->getPath())`) qui ne fonctionne que si le répertoire courant du process est `public/`. Fragile (autre SAPI, commande console, worker → écriture/suppression au mauvais endroit).
+- **Fait** :
+  - Nouveau service `MediaUploader` : `upload(UploadedFile): string` (déplace vers un dossier **absolu configuré**, renvoie le chemin public relatif `uploads/<nom>`) et `remove(?string)` (suppression par `basename` dans ce dossier, sûre si le fichier manque).
+  - Paramètre `app.uploads_dir = %kernel.project_dir%/public/uploads` + injection explicite dans `services.yaml`.
+  - `MediaController` : `add()`/`delete()` délèguent au service ; plus aucun chemin relatif.
+- **Validation** : cycle de vie complet automatisé (`scripts/test-upload.sh`) — non-image rejeté, image valide stockée sur le disque (dossier absolu), suppression admin → fichier physiquement retiré + ligne DB supprimée.
+
 ### ✅ Bug pagination admin des médias (`templates/admin/media/index.html.twig`, `MediaController`)
 - **Problème** : le contrôleur paginait par **25**/page alors que le template calculait le nombre de pages avec **50** → la seconde moitié des médias (dont les plus récents) était **injoignable** via les liens (dernière page cliquable ≈ `ceil(total/50)` au lieu de `ceil(total/25)`).
 - **Fait** :

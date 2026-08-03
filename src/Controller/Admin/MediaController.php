@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Media;
 use App\Form\MediaType;
+use App\Service\MediaUploader;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,8 +14,10 @@ class MediaController extends AbstractController
 {
     private const PER_PAGE = 25;
 
-    public function __construct(private readonly ManagerRegistry $managerRegistry)
-    {
+    public function __construct(
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly MediaUploader $mediaUploader,
+    ) {
     }
 
     #[Route('/admin/media', name: 'admin_media_index')]
@@ -56,8 +59,7 @@ class MediaController extends AbstractController
             if (!$this->isGranted('ROLE_ADMIN')) {
                 $media->setUser($this->getUser());
             }
-            $media->setPath('uploads/' . md5(uniqid()) . '.' . $media->getFile()->guessExtension());
-            $media->getFile()->move('uploads/', $media->getPath());
+            $media->setPath($this->mediaUploader->upload($media->getFile()));
             $this->managerRegistry->getManager()->persist($media);
             $this->managerRegistry->getManager()->flush();
 
@@ -71,9 +73,10 @@ class MediaController extends AbstractController
     public function delete(int $id)
     {
         $media = $this->managerRegistry->getRepository(Media::class)->find($id);
+        $path = $media->getPath();
         $this->managerRegistry->getManager()->remove($media);
         $this->managerRegistry->getManager()->flush();
-        unlink($media->getPath());
+        $this->mediaUploader->remove($path);
 
         return $this->redirectToRoute('admin_media_index');
     }
