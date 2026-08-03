@@ -119,7 +119,7 @@ URLs utiles:
 - Admin: `http://127.0.0.1:8000/admin/`
 
 Identifiants admin:
-- login: `ina`
+- email: `ina@zaoui.com`
 - password: `password`
 
 ## 7) Roadmap technique

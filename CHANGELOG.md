@@ -29,9 +29,15 @@ Résolution des anomalies de l'application (brief : vérification des fichiers u
   - Corrections annexes : `count($criteria)` au lieu de `count([])` (total juste aussi pour les non-admins) ; garde-fou `max(1, page)`.
 - **Validation** : dernière page exposée = `ceil(total/25)` et le média d'id le plus élevé est bien atteignable sur cette dernière page (vérifié via le serveur).
 
-### 🔜 Anomalie 2 — User provider dynamique (BDD)
-- **Problème** : authentification **in-memory** (`ina` en dur dans `security.yaml`) alors qu'une table `user` existe. L'entité `User` n'implémente pas `UserInterface` et n'a ni `password` ni `roles`.
-- **Fait** : _(à venir)_
+### ✅ Anomalie 2 — User provider dynamique (BDD)
+- **Problème** : authentification **in-memory** (`ina` en dur dans `security.yaml`) alors qu'une table `user` existe. L'entité `User` n'implémentait pas `UserInterface` et n'avait ni `password` ni rôles.
+- **Fait** :
+  - `User` implémente `UserInterface` + `PasswordAuthenticatedUserInterface` : `getUserIdentifier()` = **email**, `getRoles()` **dérivé de `admin`** (`ROLE_USER` + `ROLE_ADMIN` si admin), ajout de la propriété/colonne `password`.
+  - Migration `Version20260803180840` : ajout colonne `password` + définition du mot de passe admin (`ina@zaoui.com`, hash bcrypt de `password`) — reproductible (testée rollback + forward).
+  - `security.yaml` : provider **in-memory → entity** (`class: App\Entity\User`, `property: email`).
+  - Formulaire de login : identifiant = **email** (label + `type="email"`).
+- **Connexion** : désormais **`ina@zaoui.com` / `password`** (au lieu de `ina`).
+- **Validation** : bon mot de passe → accès admin 200 ; mauvais mot de passe → rejeté (302 /login) ; non connecté → `/admin` refusé. Schéma en sync, aucune dépréciation.
 
 ### 🛠️ Environnement / outillage (hors dépôt)
 - **phpMyAdmin** : bascule de la 4.9.10 (obsolète, spam de dépréciations PHP 8) vers la **5.2.0** déjà fournie par MAMP. Lien du menu WebStart de MAMP redirigé vers `/phpMyAdmin5/` (backup `index.php.bak-pma5`). URL d'admin BDD : `http://localhost:8888/phpMyAdmin5/`.
