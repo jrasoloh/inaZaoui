@@ -19,7 +19,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="">
+                                <a class="nav-link" href="{{ path('admin_guest_index') }}">
                                     Invités
                                 </a>
                             </li>
@@ -28,6 +28,11 @@
                 </div>
             </nav>
             <main class="col-md-9 ms-sm-auto col-lg-10 p-4">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label == 'success' ? 'success' : 'danger' }}">{{ message }}</div>
+                    {% endfor %}
+                {% endfor %}
                 {% block admin %}{% endblock %}
             </main>
         </div>

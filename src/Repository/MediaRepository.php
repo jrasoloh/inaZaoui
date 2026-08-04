@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Album;
 use App\Entity\Media;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,6 +20,24 @@ class MediaRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Media::class);
+    }
+
+    /**
+     * Media of an album that must be publicly displayed: only those whose owner
+     * is still active (revoked guests' photos are hidden), plus ownerless media.
+     *
+     * @return Media[]
+     */
+    public function findVisibleByAlbum(Album $album): array
+    {
+        return $this->createQueryBuilder('m')
+            ->leftJoin('m.user', 'u')
+            ->andWhere('m.album = :album')
+            ->andWhere('u.id IS NULL OR u.active = true')
+            ->setParameter('album', $album)
+            ->orderBy('m.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**
