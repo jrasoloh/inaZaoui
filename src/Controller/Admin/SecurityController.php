@@ -18,4 +18,15 @@ class SecurityController extends AbstractController
             'error'         => $error,
         ]);
     }
+
+    /**
+     * This action is never executed — the firewall intercepts /logout first.
+     *
+     * @see security.yaml logout.path
+     */
+    #[Route('/logout', name: 'app_logout')]
+    public function logout(): never
+    {
+        throw new \LogicException('This method should not be called directly.');
+    }
 }
