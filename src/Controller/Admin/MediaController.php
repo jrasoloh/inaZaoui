@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Media;
 use App\Form\MediaType;
+use App\Service\MediaUploader;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,14 +12,18 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MediaController extends AbstractController
 {
-    public function __construct(private readonly ManagerRegistry $managerRegistry)
-    {
+    private const PER_PAGE = 25;
+
+    public function __construct(
+        private readonly ManagerRegistry $managerRegistry,
+        private readonly MediaUploader $mediaUploader,
+    ) {
     }
 
     #[Route('/admin/media', name: 'admin_media_index')]
     public function index(Request $request)
     {
-        $page = $request->query->getInt('page', 1);
+        $page = max(1, $request->query->getInt('page', 1));
 
         $criteria = [];
 
@@ -26,18 +31,20 @@ class MediaController extends AbstractController
             $criteria['user'] = $this->getUser();
         }
 
-        $medias = $this->managerRegistry->getRepository(Media::class)->findBy(
+        $repository = $this->managerRegistry->getRepository(Media::class);
+        $medias = $repository->findBy(
             $criteria,
             ['id' => 'ASC'],
-            25,
-            25 * ($page - 1)
+            self::PER_PAGE,
+            self::PER_PAGE * ($page - 1)
         );
-        $total = $this->managerRegistry->getRepository(Media::class)->count([]);
+        $total = $repository->count($criteria);
 
         return $this->render('admin/media/index.html.twig', [
             'medias' => $medias,
             'total' => $total,
-            'page' => $page
+            'page' => $page,
+            'perPage' => self::PER_PAGE
         ]);
     }
 
@@ -52,8 +59,7 @@ class MediaController extends AbstractController
             if (!$this->isGranted('ROLE_ADMIN')) {
                 $media->setUser($this->getUser());
             }
-            $media->setPath('uploads/' . md5(uniqid()) . '.' . $media->getFile()->guessExtension());
-            $media->getFile()->move('uploads/', $media->getPath());
+            $media->setPath($this->mediaUploader->upload($media->getFile()));
             $this->managerRegistry->getManager()->persist($media);
             $this->managerRegistry->getManager()->flush();
 
@@ -67,9 +73,10 @@ class MediaController extends AbstractController
     public function delete(int $id)
     {
         $media = $this->managerRegistry->getRepository(Media::class)->find($id);
+        $path = $media->getPath();
         $this->managerRegistry->getManager()->remove($media);
         $this->managerRegistry->getManager()->flush();
-        unlink($media->getPath());
+        $this->mediaUploader->remove($path);
 
         return $this->redirectToRoute('admin_media_index');
     }
