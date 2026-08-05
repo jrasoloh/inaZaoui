@@ -68,3 +68,11 @@ out/
 
 /public/uploads/*
 !/public/uploads/.gitignore
+
+###> test artefacts ###
+/.phpunit.result.cache
+/var/*.db
+/var/test_uploads
+/var/coverage
+###< test artefacts ###
+

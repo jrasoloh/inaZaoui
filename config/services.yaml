@@ -31,3 +31,10 @@ services:
             $uploadsDir: '%app.uploads_dir%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+# Keep the test suite fully isolated from real media: uploads/deletions performed
+# during tests must never touch the public/uploads directory.
+when@test:
+    parameters:
+        app.uploads_dir: '%kernel.project_dir%/var/test_uploads'
+

@@ -122,7 +122,40 @@ Identifiants admin:
 - email: `ina@zaoui.com`
 - password: `password`
 
-## 7) Roadmap technique
+## 7) Tests automatises
+
+La suite de tests (PHPUnit) est **auto-contenue**: elle utilise une base **SQLite**
+dediee (`var/test.db`), recreee et rechargee avec les fixtures avant chaque test.
+Aucun serveur MySQL ni media reel n'est requis, et `public/uploads` n'est jamais
+modifie (les uploads de test vont dans `var/test_uploads`).
+
+Contenu:
+- **Fixtures** (`src/DataFixtures/AppFixtures.php`): jeu de donnees representatif
+  (photographe/admin, invites actifs, invite bloque, albums, medias).
+- **Tests unitaires**: entites (`User`, `Media`, `Album`), service `MediaUploader`,
+  `UserChecker`, formulaire `GuestType`.
+- **Tests fonctionnels/integration**: Front Office (`HomeController`), securite
+  (login/logout, refus des invites bloques), controle d'acces admin, gestion des
+  invites, albums, medias, et `MediaRepository::findVisibleByAlbum`.
+
+Lancer les tests:
+
+```zsh
+composer test
+# ou
+php bin/phpunit
+```
+
+Couverture de code (necessite l'extension `pcov` ou `xdebug`):
+
+```zsh
+composer test:coverage
+# rapport HTML: var/coverage/index.html
+```
+
+La couverture des lignes du dossier `src/` est superieure a 70% (objectif du brief).
+
+## 8) Roadmap technique
 
 Etat actuel: import SQL historique + medias externes.
 

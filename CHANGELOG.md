@@ -9,6 +9,37 @@ Le plus récent est en haut.
 
 ---
 
+## En cours — `feat/tests`
+
+Mise en place des tests automatisés (fixtures + PHPUnit) avec une couverture ≥ 70 %.
+
+### ✅ Fixtures représentatives
+- **Ajouté** : `doctrine/doctrine-fixtures-bundle` (dev/test) et `src/DataFixtures/AppFixtures.php`.
+- **Scénarios couverts** : photographe/admin, deux invités actifs, un invité bloqué (révoqué),
+  albums (`Nature`, `Ville`), médias appartenant à l'admin, à un invité actif, à un invité bloqué,
+  ainsi qu'un média sans propriétaire. Les identifiants sont exposés en constantes réutilisées par les tests.
+
+### ✅ Suite de tests PHPUnit
+- **Environnement isolé** : base **SQLite** dédiée (`var/test.db`) recréée + rechargée avant chaque
+  test via `tests/FixturesTrait`. `app.uploads_dir` est surchargé vers `var/test_uploads` en env de test
+  pour ne **jamais** toucher `public/uploads`.
+- **Tests unitaires** : `User` (rôles, identifiant, collection médias), `Media`, `Album`,
+  `MediaUploader` (upload/suppression), `UserChecker` (refus des comptes révoqués), `GuestType`.
+- **Tests fonctionnels** : Front Office (`HomeController` — accueil, invités, portfolio, 404),
+  sécurité (login/logout, mauvais mot de passe, invité bloqué refusé), contrôle d'accès `^/admin`,
+  gestion des invités (ajout, blocage/déblocage, révocation CSRF, suppression), albums, médias.
+- **Test d'intégration** : `MediaRepository::findVisibleByAlbum` masque bien les photos des invités bloqués.
+
+**Corrections de configuration nécessaires aux tests**
+- `framework.yaml` : suppression de l'option obsolète `annotations` (bloquait le boot du kernel en env test).
+- `.env.test` : `DATABASE_URL` SQLite. `services.yaml` : override `app.uploads_dir` en `when@test`.
+
+**Validation**
+- `composer test` : **54 tests, 144 assertions, OK**.
+- `composer test:coverage` : lignes **95,57 %** (302/316), méthodes **93 %** — objectif ≥ 70 % atteint.
+
+---
+
 ## En cours — `feat/guest-management`
 
 Implémentation de la gestion des invités (brief : interface admin + contrôle d'accès).
