@@ -9,7 +9,39 @@ Le plus récent est en haut.
 
 ---
 
-## En cours — `feat/fix-upload-and-user-provider`
+## En cours — `feat/guest-management`
+
+Implémentation de la gestion des invités (brief : interface admin + contrôle d'accès).
+
+### ✅ Gestion des invités — admin + front
+
+**Modèle**
+- `User.active` (bool, défaut `true`) + migration `Version20260804120812`.
+- Cascade `orphanRemoval` sur `User.medias` : supprimer un invité supprime ses médias en DB.
+
+**Contrôle d'accès**
+- `src/Security/UserChecker.php` : refuse la connexion aux invités dont `active = false` (`CustomUserMessageAccountStatusException`).
+- `security.yaml` : `user_checker: App\Security\UserChecker` branché sur le firewall `main`.
+- `GuestController` annoté `#[IsGranted('ROLE_ADMIN')]` : inaccessible aux invités (ROLE_USER → 403).
+
+**Interface admin** (`/admin/guest`, ROLE_ADMIN uniquement)
+- **Liste** : tableau des invités avec badge Actif/Bloqué, bouton Bloquer/Débloquer individuel, cases à cocher pour la révocation en masse, bouton Supprimer.
+- **Ajout** : formulaire `GuestType` (nom, email, description, mot de passe) ; invité créé avec `active=true`, mot de passe haché.
+- **Bloquer/Débloquer** : `GET /admin/guest/toggle/{id}` — bascule `active`.
+- **Révoquer une sélection** : `POST /admin/guest/revoke` (CSRF protégé) — met `active=false` sur les ids cochés.
+- **Supprimer** : `GET /admin/guest/delete/{id}` — supprime les fichiers physiques via `MediaUploader` puis la ligne `user` (cascade ORM supprime les médias en DB).
+- Messages flash (succès/erreur) affichés dans `admin.html.twig`.
+- Lien « Invités » dans la sidebar admin (était vide, maintenant câblé sur `admin_guest_index`).
+
+**Front**
+- `/guests` : n'affiche que les invités `active=true`.
+- `/guest/{id}` : 404 si invité bloqué ou inexistant.
+- Portfolio par album : `MediaRepository::findVisibleByAlbum()` exclut les photos des invités bloqués.
+
+**Validation** (tests automatisés)
+- `scripts/test-guests.sh` : ajout → login OK → blocage → login refusé → invisible front → suppression.
+- Test cascade : invité avec média + fichier → suppression → média et fichier effacés.
+- Test ROLE : invité (ROLE_USER) → `/admin/guest` = 403, `/admin/media` = 200.
 
 Résolution des anomalies de l'application (brief : vérification des fichiers uploadés + gestion dynamique des connexions).
 

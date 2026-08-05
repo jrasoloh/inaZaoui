@@ -24,7 +24,10 @@ class HomeController extends AbstractController
     #[Route('/guests', name: 'guests')]
     public function guests()
     {
-        $guests = $this->managerRegistry->getRepository(User::class)->findBy(['admin' => false]);
+        $guests = $this->managerRegistry->getRepository(User::class)->findBy([
+            'admin' => false,
+            'active' => true,
+        ]);
         return $this->render('front/guests.html.twig', [
             'guests' => $guests
         ]);
@@ -33,7 +36,16 @@ class HomeController extends AbstractController
     #[Route('/guest/{id}', name: 'guest')]
     public function guest(int $id)
     {
-        $guest = $this->managerRegistry->getRepository(User::class)->find($id);
+        $guest = $this->managerRegistry->getRepository(User::class)->findOneBy([
+            'id' => $id,
+            'admin' => false,
+            'active' => true,
+        ]);
+
+        if (null === $guest) {
+            throw $this->createNotFoundException('Invité introuvable ou accès révoqué.');
+        }
+
         return $this->render('front/guest.html.twig', [
             'guest' => $guest
         ]);
@@ -47,7 +59,7 @@ class HomeController extends AbstractController
         $user = $this->managerRegistry->getRepository(User::class)->findOneByAdmin(true);
 
         $medias = $album
-            ? $this->managerRegistry->getRepository(Media::class)->findByAlbum($album)
+            ? $this->managerRegistry->getRepository(Media::class)->findVisibleByAlbum($album)
             : $this->managerRegistry->getRepository(Media::class)->findByUser($user);
         return $this->render('front/portfolio.html.twig', [
             'albums' => $albums,
