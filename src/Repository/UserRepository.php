@@ -40,6 +40,37 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * Active guests (non-admin) together with their media count, computed in a
+     * SINGLE aggregated query.
+     *
+     * This avoids the N+1 problem of the "Invités" page: previously the template
+     * called `guest.medias|length` for every guest, triggering one extra SELECT
+     * per guest (plus eager loading of each media's associations).
+     *
+     * @return array<int, array{guest: User, mediaCount: int}>
+     */
+    public function findActiveGuestsWithMediaCount(): array
+    {
+        $rows = $this->createQueryBuilder('u')
+            ->select('u AS guest', 'COUNT(m.id) AS mediaCount')
+            ->leftJoin('u.medias', 'm')
+            ->where('u.admin = false')
+            ->andWhere('u.active = true')
+            ->groupBy('u.id')
+            ->orderBy('u.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        return array_map(
+            static fn (array $row): array => [
+                'guest' => $row['guest'],
+                'mediaCount' => (int) $row['mediaCount'],
+            ],
+            $rows,
+        );
+    }
+
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

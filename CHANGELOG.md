@@ -9,6 +9,32 @@ Le plus récent est en haut.
 
 ---
 
+## En cours — `feat/performance-guests`
+
+Optimisation de la page **« Invités »** (`/guests`) et rapport de performance.
+
+### ✅ Correction du N+1 sur `/guests`
+- **Problème** : le template appelait `guest.medias|length` dans une boucle sur
+  les 100 invités → **1 + 100 = 101 requêtes SQL** (N+1), page ~40× plus lente
+  que les autres pages du Front Office (mesuré sur la base réelle : 101 users, 5050 médias).
+- **Fait** : `UserRepository::findActiveGuestsWithMediaCount()` calcule le nombre
+  de photos en **une seule requête agrégée** (`GROUP BY`). `HomeController::guests()`
+  et `templates/front/guests.html.twig` adaptés (compteur pré-calculé).
+- **Résultat** : `/guests` passe de **101 → 1 requête** et de **~177 ms → ~8 ms**
+  (÷22), coût désormais **indépendant du nombre d'invités**.
+
+### ✅ Outillage & garde-fous
+- `scripts/perf-measure.php` : sonde reproductible (requêtes SQL / temps / mémoire
+  via le Web Profiler) pour les pages du Front Office.
+- `tests/Controller/GuestsPagePerformanceTest` : non-régression (≤ 2 requêtes).
+- `tests/Repository/UserRepositoryTest` : exactitude des compteurs (invités actifs
+  uniquement, admin/bloqués exclus).
+- `docs/RAPPORT_PERFORMANCE.md` : rapport complet avant/après.
+
+**Validation** : `composer test` → **56 tests, 153 assertions, OK**.
+
+---
+
 ## En cours — `feat/tests`
 
 Mise en place des tests automatisés (fixtures + PHPUnit) avec une couverture ≥ 70 %.
