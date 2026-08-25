@@ -24,10 +24,11 @@ class HomeController extends AbstractController
     #[Route('/guests', name: 'guests')]
     public function guests()
     {
-        $guests = $this->managerRegistry->getRepository(User::class)->findBy([
-            'admin' => false,
-            'active' => true,
-        ]);
+        // Single aggregated query (guest + media count) to avoid the N+1 that
+        // previously made this page slow (one extra query per guest).
+        $guests = $this->managerRegistry->getRepository(User::class)
+            ->findActiveGuestsWithMediaCount();
+
         return $this->render('front/guests.html.twig', [
             'guests' => $guests
         ]);
