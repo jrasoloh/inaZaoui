@@ -155,6 +155,29 @@ composer test:coverage  # rapport de couverture -> var/coverage/index.html
 
 La couverture de lignes du dossier `src/` est **> 90 %** (objectif >= 70 %).
 
+## Analyse statique (PHPStan)
+
+**PHPStan** analyse le code sans l'exécuter et repère les erreurs potentielles
+(méthodes inexistantes, types incohérents...). L'extension `phpstan-doctrine`
+lui apprend à comprendre les entités et repositories Doctrine.
+
+```zsh
+composer phpstan        # analyse le dossier src/ (niveau 5)
+```
+
+Configuration : `phpstan.dist.neon`.
+
+## Intégration continue (CI)
+
+À chaque `push` sur `main` et à chaque Pull Request, **GitHub Actions** exécute
+automatiquement (`.github/workflows/ci.yml`) :
+
+1. l'installation de PHP 8.4 et des dépendances Composer ;
+2. la **suite de tests** (`composer test`) ;
+3. l'**analyse statique** (`composer phpstan`).
+
+Une PR ne peut être mergée sereinement que si ces vérifications sont **au vert**.
+
 ---
 
 ## Structure du projet

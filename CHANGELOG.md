@@ -9,6 +9,36 @@ Le plus récent est en haut.
 
 ---
 
+## En cours — `ci/github-actions`
+
+Mise en place d'un pipeline d'intégration continue (CI) sur GitHub Actions.
+
+### ✅ Pipeline CI (`.github/workflows/ci.yml`)
+- Déclenché à chaque **push sur `main`** et à chaque **Pull Request**.
+- **Job `tests`** : PHP 8.4 + extensions, cache Composer, `composer validate
+  --strict --no-check-publish`, install, puis `composer test` (suite PHPUnit
+  auto-contenue SQLite — aucune base externe requise).
+- **Job `static-analysis`** : `composer phpstan` (analyse statique).
+
+### ✅ Analyse statique (PHPStan)
+- Ajout de `phpstan/phpstan` + extension `phpstan/phpstan-doctrine` (dev).
+- `phpstan.dist.neon` : niveau 5 sur `src/`, `objectManagerLoader`
+  (`tests/object-manager.php`) pour la résolution du mapping Doctrine,
+  `allowNullablePropertyForRequiredField` (motif Symfony des champs requis).
+- Script `composer phpstan`.
+
+### ✅ Corrections révélées par PHPStan
+- `MediaController::add()` : garde `instanceof User` avant `setUser()`
+  (`getUser()` renvoie `?UserInterface`).
+- `User::$medias` : annotation générique `Collection<int, Media>`.
+- `UserRepository` : suppression du tag `@implements` erroné
+  (`PasswordUpgraderInterface` n'est pas générique).
+
+**Validation** (local, PHP 8.4) : `composer test` → **56 tests, 153 assertions, OK** ;
+`composer phpstan` → **No errors** ; `composer validate --strict --no-check-publish` → OK.
+
+---
+
 ## En cours — `docs/readme-contributing`
 
 Documentation de passation pour le nouveau développeur.

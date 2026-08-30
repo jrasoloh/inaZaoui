@@ -1,0 +1,98 @@
+# Nom du pipeline, affiché dans l'onglet "Actions" de GitHub.
+name: CI
+
+# --- Déclencheurs : quand ce workflow doit-il s'exécuter ? ---
+on:
+  push:
+    branches: [ main ]      # à chaque push sur main (ex. après un merge de PR)
+  pull_request:             # et à chaque Pull Request (avant de merger)
+
+# Bonne pratique de sécurité : on ne donne au robot qu'un accès en lecture.
+permissions:
+  contents: read
+
+# Variables d'environnement communes à tous les jobs.
+# APP_ENV=test => Symfony charge .env.test (base SQLite auto-contenue).
+env:
+  APP_ENV: test
+
+jobs:
+  # =========================================================================
+  # JOB 1 : exécution de la suite de tests (PHPUnit)
+  # =========================================================================
+  tests:
+    name: Tests (PHPUnit)
+    runs-on: ubuntu-latest   # la machine virtuelle fournie par GitHub
+
+    steps:
+      # 1) Récupère le code du dépôt sur le runner.
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2) Installe PHP 8.4 avec les extensions dont le projet a besoin.
+      #    pdo_sqlite est requis par la base de test SQLite.
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+
+      # 3) Vérifie que composer.json / composer.lock sont cohérents.
+      #    --no-check-publish : on ignore les champs "name"/"description" qui ne
+      #    servent qu'à publier un package (ici c'est une application).
+      - name: Validate composer files
+        run: composer validate --strict --no-check-publish
+
+      # 4) Met en cache les dépendances Composer pour accélérer les runs suivants.
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      # 5) Installe les dépendances (prod + dev) exactement selon composer.lock.
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      # 6) Lance la suite de tests via le script composer déjà défini.
+      - name: Run test suite
+        run: composer test
+
+  # =========================================================================
+  # JOB 2 : analyse statique du code (PHPStan)
+  # =========================================================================
+  static-analysis:
+    name: Static analysis (PHPStan)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      # PHPStan lit le code (et le mapping Doctrine via tests/object-manager.php)
+      # sans l'exécuter, puis échoue s'il détecte une erreur.
+      - name: Run PHPStan
+        run: composer phpstan
+
+
