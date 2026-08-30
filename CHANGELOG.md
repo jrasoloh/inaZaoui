@@ -9,6 +9,29 @@ Le plus récent est en haut.
 
 ---
 
+## En cours — `docs/readme-contributing`
+
+Documentation de passation pour le nouveau développeur.
+
+### ✅ `README.md` réécrit (clair et concis)
+- **Structure** : Prérequis / Installation / Usage (+ Tests, Structure du projet).
+- **Prérequis** actualisés (PHP ≥ 8.4, Symfony 8.1, MySQL, Composer, pcov/Xdebug optionnel).
+- **Installation** en étapes reproductibles : dépendances, `.env.local`, base +
+  migrations, puis deux options de données — **fixtures** (recommandé, avec table
+  des identifiants) ou dumps SQL historiques.
+- **Usage** : lancement du serveur, table des URLs et des accès, description des
+  fonctionnalités Front/Back Office.
+
+### ✅ `CONTRIBUTING.md` ajouté
+- Directives pour **signaler un problème**, **proposer une fonctionnalité**, et
+  **contribuer** au code, aux tests et à la documentation.
+- Workflow Git (branches préfixées, PR vers `main`), style de code (standards
+  Symfony/PSR-12, injection de dépendances), conventions **Conventional Commits**.
+- Exigences de tests (miroir de `src/`, réutilisation des fixtures, couverture ≥ 70 %)
+  et checklist de Pull Request.
+
+---
+
 ## En cours — `feat/performance-guests`
 
 Optimisation de la page **« Invités »** (`/guests`) et rapport de performance.
