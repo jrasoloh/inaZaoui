@@ -82,10 +82,10 @@
             "@auto-scripts"
         ],
         "test": [
-            "@php bin/phpunit"
+            "@php vendor/bin/phpunit"
         ],
         "test:coverage": [
-            "@php -d pcov.enabled=1 bin/phpunit --coverage-text --coverage-html var/coverage"
+            "@php -d pcov.enabled=1 vendor/bin/phpunit --coverage-text --coverage-html var/coverage"
         ],
         "phpstan": [
             "@php vendor/bin/phpstan analyse --memory-limit=512M"
