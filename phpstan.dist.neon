@@ -1,0 +1,14 @@
+includes:
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
+
+parameters:
+    level: 5
+    paths:
+        - src
+    doctrine:
+        objectManagerLoader: tests/object-manager.php
+        # Required fields (name, email) are typed ?string because they are null
+        # until the form fills them: this is the standard Symfony entity pattern.
+        allowNullablePropertyForRequiredField: true
+

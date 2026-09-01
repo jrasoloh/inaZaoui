@@ -82,10 +82,13 @@
             "@auto-scripts"
         ],
         "test": [
-            "@php bin/phpunit"
+            "@php vendor/bin/phpunit"
         ],
         "test:coverage": [
-            "@php -d pcov.enabled=1 bin/phpunit --coverage-text --coverage-html var/coverage"
+            "@php -d pcov.enabled=1 vendor/bin/phpunit --coverage-text --coverage-html var/coverage"
+        ],
+        "phpstan": [
+            "@php vendor/bin/phpstan analyse --memory-limit=512M"
         ]
     },
     "conflict": {
@@ -99,7 +102,8 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.3",
-        "doctrine/doctrine-fixtures-bundle": "^4.3",
+        "phpstan/phpstan": "^2.2",
+        "phpstan/phpstan-doctrine": "^2.0",
         "phpunit/phpunit": "^9.5",
         "symfony/browser-kit": "8.1.*",
         "symfony/css-selector": "8.1.*",

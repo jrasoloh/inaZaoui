@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Media;
+use App\Entity\User;
 use App\Form\MediaType;
 use App\Service\MediaUploader;
 use Doctrine\Persistence\ManagerRegistry;
@@ -57,7 +58,10 @@ class MediaController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             if (!$this->isGranted('ROLE_ADMIN')) {
-                $media->setUser($this->getUser());
+                $user = $this->getUser();
+                if ($user instanceof User) {
+                    $media->setUser($user);
+                }
             }
             $media->setPath($this->mediaUploader->upload($media->getFile()));
             $this->managerRegistry->getManager()->persist($media);
