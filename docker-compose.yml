@@ -1,0 +1,47 @@
+# =============================================================================
+# Environnement "proche de la production" pour lancer le site en local avec
+# Docker. Sert à VALIDER le déploiement : build de l'image, base MySQL,
+# stockage persistant des uploads.
+#
+#   docker compose up --build      -> construit et démarre
+#   http://localhost:8080          -> le site
+#
+# NB : les valeurs ci-dessous sont des exemples pour un test local.
+#      En production réelle, fournissez des secrets via l'hébergeur.
+# =============================================================================
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inazaoui
+    volumes:
+      - db_data:/var/lib/mysql        # <-- persistance de la base
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: 0
+      # En prod réelle : générer une vraie valeur (php bin/console secrets, etc.)
+      APP_SECRET: change_me_in_real_production
+      DATABASE_URL: "mysql://root:root@db:3306/inazaoui?serverVersion=8.0&charset=utf8mb4"
+      MAILER_DSN: "null://null"
+      MESSENGER_TRANSPORT_DSN: "doctrine://default?auto_setup=0"
+    ports:
+      - "8080:80"
+    volumes:
+      - uploads_data:/var/www/html/public/uploads   # <-- persistance des photos
+
+volumes:
+  db_data:
+  uploads_data:
+

@@ -1,0 +1,32 @@
+# Exclut du contexte de build tout ce qui ne doit PAS entrer dans l'image.
+
+# Dépendances : réinstallées proprement pendant le build.
+/vendor/
+
+# Historique Git et métadonnées.
+/.git/
+/.github/
+/.gitignore
+
+# Fichiers de dev / cache / logs.
+/var/
+/.phpunit.result.cache
+/.phpunit.cache/
+
+# Uploads volumineux (5000+ images) : fournis via un volume persistant au runtime,
+# jamais copiés dans l'image.
+/public/uploads/
+
+# Secrets et surcharges locales : ne doivent jamais être dans l'image.
+/.env.local
+/.env.*.local
+
+# Tests, docs et outils inutiles en production.
+/tests/
+/docs/
+/scripts/
+/phpstan.dist.neon
+
+# Divers OS/éditeur.
+**/.DS_Store
+

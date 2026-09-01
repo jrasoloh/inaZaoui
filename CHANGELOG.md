@@ -9,6 +9,40 @@ Le plus récent est en haut.
 
 ---
 
+## En cours — `chore/deployment-prep`
+
+Préparation du déploiement : image Docker de production + guide de déploiement.
+
+### ✅ Conteneurisation (Docker)
+- `Dockerfile` : image **PHP 8.4 + Apache**, extensions (`intl`, `pdo_mysql`,
+  `zip`, `opcache`), OPcache activé, `composer install --no-dev
+  --optimize-autoloader`, cache de prod préparé au démarrage (`entrypoint.sh`).
+- `docker/apache/000-default.conf` : vhost Symfony (racine `public/`,
+  `FallbackResource /index.php`) + `PassEnv` des variables d'environnement.
+- `docker-compose.yml` : app + **MySQL 8** + volumes persistants (`db_data`,
+  `uploads_data` pour les photos).
+- `.dockerignore` : exclut `vendor/`, `.git/`, les **5000+ images** de
+  `public/uploads/`, `.env.local`, tests/docs.
+
+### ✅ Guide de déploiement
+- `docs/DEPLOYMENT.md` : variables d'environnement, déploiement Docker,
+  initialisation de la base, persistance des uploads, checklist de mise en
+  production, notes PaaS/VPS, et dépannage.
+
+### ✅ Validation (testée en local avec Docker)
+- `docker compose up --build` → build OK, MySQL healthy, app up.
+- Front Office : `/`, `/guests`, `/login`, `/portfolio` → **HTTP 200** ;
+  fichier statique → 200 ; `APP_ENV` vu par l'app = **prod**.
+
+### 🐞 Deux pièges rencontrés et corrigés
+- **`DebugBundle not found` (500)** : sous Apache mod_php, les variables d'env de
+  l'OS ne sont pas dans `$_SERVER` → Symfony retombait en `dev`. Corrigé avec
+  `PassEnv` dans le vhost.
+- **`Table 'user' doesn't exist`** : migrations incrémentales → base vide non
+  créée. Documenté : `schema:create` + `migrations:version --add --all`.
+
+---
+
 ## En cours — `ci/github-actions`
 
 Mise en place d'un pipeline d'intégration continue (CI) sur GitHub Actions.

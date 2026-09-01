@@ -178,6 +178,22 @@ automatiquement (`.github/workflows/ci.yml`) :
 
 Une PR ne peut être mergée sereinement que si ces vérifications sont **au vert**.
 
+## Déploiement
+
+Le projet est livré avec une **image Docker de production** (`Dockerfile`) et une
+stack `docker-compose.yml` pour tester le déploiement en local :
+
+```zsh
+docker compose up --build -d
+docker compose exec app php bin/console doctrine:schema:create
+docker compose exec app php bin/console doctrine:migrations:version --add --all --no-interaction
+open http://localhost:8080
+```
+
+La procédure complète (variables d'environnement, initialisation de la base,
+persistance des uploads, checklist de mise en production, autres hébergeurs) est
+détaillée dans **[`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)**.
+
 ---
 
 ## Structure du projet
