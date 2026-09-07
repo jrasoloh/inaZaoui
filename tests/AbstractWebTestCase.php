@@ -4,6 +4,7 @@ namespace App\Tests;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Zenstruck\Foundry\Test\Factories;
 
 /**
  * Base class for functional tests: boots a client and loads a fresh database
@@ -11,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 abstract class AbstractWebTestCase extends WebTestCase
 {
+    use Factories;
     use FixturesTrait;
 
     protected KernelBrowser $client;

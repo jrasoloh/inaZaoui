@@ -6,9 +6,11 @@ use App\DataFixtures\AppFixtures;
 use App\Entity\User;
 use App\Tests\FixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
 
 class UserRepositoryTest extends KernelTestCase
 {
+    use Factories;
     use FixturesTrait;
 
     protected function setUp(): void

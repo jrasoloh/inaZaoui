@@ -7,9 +7,11 @@ use App\Entity\Album;
 use App\Entity\Media;
 use App\Tests\FixturesTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Zenstruck\Foundry\Test\Factories;
 
 class MediaRepositoryTest extends KernelTestCase
 {
+    use Factories;
     use FixturesTrait;
 
     protected function setUp(): void

@@ -10,7 +10,6 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Recreates the test schema and loads {@see AppFixtures} so every database test
@@ -37,11 +36,8 @@ trait FixturesTrait
             $schemaTool->createSchema($metadata);
         }
 
-        /** @var UserPasswordHasherInterface $hasher */
-        $hasher = $container->get(UserPasswordHasherInterface::class);
-
         $loader = new Loader();
-        $loader->addFixture(new AppFixtures($hasher));
+        $loader->addFixture(new AppFixtures());
 
         $executor = new ORMExecutor($em, new ORMPurger());
         $executor->execute($loader->getFixtures());
