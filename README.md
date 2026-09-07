@@ -115,6 +115,16 @@ symfony serve
 php -S 127.0.0.1:8000 -t public/
 ```
 
+> **Limites d'upload.** La politique applicative autorise les images jusqu'à
+> **8 Mo**. Les limites PHP correspondantes sont fournies dans
+> [`public/.user.ini`](public/.user.ini) (`upload_max_filesize=8M`,
+> `post_max_size=12M`), lues automatiquement en FPM/CGI (MAMP, `symfony serve`).
+> Avec le serveur intégré `php -S`, passez-les en ligne de commande :
+>
+> ```zsh
+> php -d upload_max_filesize=8M -d post_max_size=12M -S 127.0.0.1:8000 -t public/
+> ```
+
 ### URLs principales
 
 | Zone | URL | Accès |
