@@ -80,9 +80,9 @@ Identifiants créés par les fixtures :
 
 | Rôle | Email | Mot de passe |
 |------|-------|--------------|
-| Administrateur | `admin@example.com` | `adminpass` |
-| Invité actif | `alice@example.com` | `alicepass` |
-| Invité bloqué | `bob@example.com` | `bobpass` |
+| Administrateur | `ina@zaoui.com` | `password` |
+| Invité actif | `alice@example.com` | `test` |
+| Invité bloqué | `bob@example.com` | `test` |
 
 **Option B — Données historiques (dumps SQL)**
 
