@@ -7,12 +7,74 @@
     </div>
     {{ form_start(form) }}
         {{ form_errors(form) }}
+        {# Erreur affichée côté client si l'image dépasse la taille autorisée :
+           on bloque l'envoi pour ne PAS perdre les autres champs déjà saisis. #}
+        <div id="client-file-error" class="alert alert-danger d-none" role="alert"></div>
         {{ form_row(form.user) }}
         {% if is_granted('ROLE_ADMIN') %}
             {{ form_row(form.album) }}
             {{ form_row(form.title) }}
         {% endif %}
-        {{ form_row(form.file) }}
+        {{ form_row(form.file, { help: 'Formats acceptés : JPEG, PNG, WEBP, GIF. Taille maximale : 8 Mo.' }) }}
         <button type="submit" class="btn btn-primary">Ajouter</button>
     {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var MAX_BYTES = 8 * 1024 * 1024; // 8 Mo
+            var MESSAGE = 'L’image sélectionnée dépasse 8 Mo. Merci d’en choisir une plus légère.';
+
+            var fileInput = document.getElementById('media_file')
+                || document.querySelector('input[type="file"]');
+            if (!fileInput) {
+                return;
+            }
+
+            var form = fileInput.form;
+            var errorBox = document.getElementById('client-file-error');
+
+            function showError() {
+                if (errorBox) {
+                    errorBox.textContent = MESSAGE;
+                    errorBox.classList.remove('d-none');
+                }
+            }
+
+            function clearError() {
+                if (errorBox) {
+                    errorBox.textContent = '';
+                    errorBox.classList.add('d-none');
+                }
+            }
+
+            function isTooBig() {
+                return fileInput.files.length > 0 && fileInput.files[0].size > MAX_BYTES;
+            }
+
+            // Contrôle immédiat à la sélection : on vide seulement le champ image.
+            fileInput.addEventListener('change', function () {
+                if (isTooBig()) {
+                    showError();
+                    fileInput.value = '';
+                } else {
+                    clearError();
+                }
+            });
+
+            // Filet de sécurité à la soumission : on empêche l'envoi d'un fichier
+            // trop lourd (ce qui viderait sinon tout le formulaire côté serveur).
+            if (form) {
+                form.addEventListener('submit', function (event) {
+                    if (isTooBig()) {
+                        event.preventDefault();
+                        showError();
+                        fileInput.value = '';
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}
