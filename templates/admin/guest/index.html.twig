@@ -10,7 +10,7 @@
         <input type="hidden" name="_token" value="{{ csrf_token('revoke_guests') }}">
 
         <div class="d-flex justify-content-end my-3">
-            <button type="submit" class="btn btn-outline-danger"
+            <button type="submit" id="revoke-selection" class="btn btn-outline-danger" disabled
                     onclick="return confirm('Révoquer l’accès des invités sélectionnés ?')">
                 Révoquer la sélection
             </button>
@@ -29,7 +29,7 @@
             <tbody>
                 {% for guest in guests %}
                     <tr>
-                        <td><input type="checkbox" name="guests[]" value="{{ guest.id }}"></td>
+                        <td><input type="checkbox" class="guest-checkbox" name="guests[]" value="{{ guest.id }}"></td>
                         <td>{{ guest.name }}</td>
                         <td>{{ guest.email }}</td>
                         <td>
@@ -57,5 +57,32 @@
             </tbody>
         </table>
     </form>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var revokeButton = document.getElementById('revoke-selection');
+            var checkboxes = document.querySelectorAll('.guest-checkbox');
+            if (!revokeButton || checkboxes.length === 0) {
+                return;
+            }
+
+            function refreshRevokeButton() {
+                var hasSelection = Array.prototype.some.call(checkboxes, function (checkbox) {
+                    return checkbox.checked;
+                });
+                revokeButton.disabled = !hasSelection;
+            }
+
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', refreshRevokeButton);
+            });
+
+            // État initial (ex. après un retour navigateur qui garde les cases cochées).
+            refreshRevokeButton();
+        });
+    </script>
 {% endblock %}
 
