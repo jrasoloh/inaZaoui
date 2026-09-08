@@ -53,7 +53,12 @@ class MediaController extends AbstractController
     public function add(Request $request)
     {
         $media = new Media();
-        $form = $this->createForm(MediaType::class, $media, ['is_admin' => $this->isGranted('ROLE_ADMIN')]);
+        $form = $this->createForm(MediaType::class, $media, [
+            'is_admin' => $this->isGranted('ROLE_ADMIN'),
+            // Message affiché lorsque la requête dépasse post_max_size (PHP jette
+            // alors $_POST/$_FILES) : on le formule proprement en français.
+            'post_max_size_message' => 'Le fichier est trop volumineux. Merci d’envoyer une image de 8 Mo maximum.',
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

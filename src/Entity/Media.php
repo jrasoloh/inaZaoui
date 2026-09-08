@@ -33,6 +33,8 @@ class Media
         mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
         mimeTypesMessage: 'Format invalide : merci d’uploader une image JPEG, PNG, WEBP ou GIF.',
         maxSizeMessage: 'L’image est trop lourde ({{ size }} {{ suffix }}). Taille maximale autorisée : {{ limit }} {{ suffix }}.',
+        uploadIniSizeErrorMessage: 'L’image dépasse la taille maximale autorisée (8 Mo).',
+        uploadErrorMessage: 'L’upload de l’image a échoué. Merci de réessayer.',
     )]
     private ?UploadedFile $file = null;
 
