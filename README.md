@@ -5,8 +5,7 @@ Application web de portfolio pour la photographe **Ina Zaoui**, développée ave
 album, présentation des invités) et un **Back Office** d'administration
 (gestion des albums, des médias et des invités avec contrôle d'accès).
 
-> 📓 L'historique détaillé des évolutions est dans [`CHANGELOG.md`](CHANGELOG.md).
-> Le rapport de performance est dans [`docs/RAPPORT_PERFORMANCE.md`](docs/RAPPORT_PERFORMANCE.md).
+> 📓 Le rapport de performance est dans [`docs/RAPPORT_PERFORMANCE.md`](docs/RAPPORT_PERFORMANCE.md).
 > Pour contribuer, voir [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ---
@@ -87,10 +86,8 @@ Identifiants créés par les fixtures :
 **Option B — Données historiques (dumps SQL)**
 
 Les dumps historiques (`album.sql`, `user.sql`, `media.sql`) sont au format
-PostgreSQL. Pour les importer en MySQL, il faut convertir les préfixes
-(`public.` / `"user"`) puis importer dans l'ordre **album → user → media**.
-La procédure complète est documentée dans le [`CHANGELOG.md`](CHANGELOG.md)
-(jalon « Onboarding »).
+PostgreSQL. Pour les importer en MySQL, convertissez les préfixes
+(`public.` / `"user"`) puis importez dans l'ordre **album → user → media**.
 
 ### 5. Synchroniser les images (optionnel)
 
