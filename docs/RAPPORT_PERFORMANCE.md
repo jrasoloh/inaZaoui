@@ -1,5 +1,7 @@
 # Rapport de performance — Ina Zaoui
 
+**Jossy RASOLOHARIJAONA** — 8 septembre 2026
+
 > Objet : identification et correction des lenteurs de la page **« Invités »** (`/guests`),
 > puis mesure de l'ensemble des pages du Front Office avant/après correction.
 
