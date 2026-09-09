@@ -76,3 +76,9 @@ out/
 /var/coverage
 ###< test artefacts ###
 
+# Generated docs (exported locally, not versioned)
+/docs/*.pdf
+
+# Personal working notes (kept local, not part of the delivery)
+/CHANGELOG.md
+
