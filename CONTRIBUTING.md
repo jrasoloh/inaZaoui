@@ -147,8 +147,6 @@ La documentation est aussi importante que le code :
 - **`README.md`** — prérequis, installation, usage. À mettre à jour dès qu'une
   étape d'installation ou une commande change.
 - **`CONTRIBUTING.md`** — ce guide.
-- **`CHANGELOG.md`** — ajoutez une entrée pour tout changement notable (contexte,
-  ce qui a été fait, validation), format inspiré de *Keep a Changelog*.
 - **`docs/`** — documents transverses (ex. rapport de performance).
 
 Vérifiez l'orthographe, les liens et les blocs de code (langage indiqué,
@@ -182,7 +180,7 @@ Rédigez les messages en **anglais**, à l'impératif présent.
 ## Processus de Pull Request
 
 1. Assurez-vous que **`composer test` passe** et que la couverture reste >= 70 %.
-2. Mettez à jour la **documentation** impactée (`README`, `CHANGELOG`, `docs/`).
+2. Mettez à jour la **documentation** impactée (`README`, `docs/`).
 3. Ouvrez la PR vers **`main`** avec un titre au format Conventional Commits et
    une description claire : **contexte**, **changements**, **validation**
    (résultat des tests, mesures éventuelles).
