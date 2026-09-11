@@ -10,11 +10,13 @@
         {# Erreur affichée côté client si l'image dépasse la taille autorisée :
            on bloque l'envoi pour ne PAS perdre les autres champs déjà saisis. #}
         <div id="client-file-error" class="alert alert-danger d-none" role="alert"></div>
-        {{ form_row(form.user) }}
+        {# Owner and album are managed by the admin only. A guest can only add a
+           media to their own account (owner is assigned automatically). #}
         {% if is_granted('ROLE_ADMIN') %}
+            {{ form_row(form.user) }}
             {{ form_row(form.album) }}
-            {{ form_row(form.title) }}
         {% endif %}
+        {{ form_row(form.title) }}
         {{ form_row(form.file, { help: 'Formats acceptés : JPEG, PNG, WEBP, GIF. Taille maximale : 8 Mo.' }) }}
         <button type="submit" class="btn btn-primary">Ajouter</button>
     {{ form_end(form) }}
