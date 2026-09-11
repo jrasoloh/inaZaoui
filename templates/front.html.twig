@@ -27,11 +27,11 @@
                             <a class="nav-link" href="{{ path('about') }}">Qui suis-je ?</a>
                         </li>
                         {% if is_granted('ROLE_USER') %}
-                            {% if is_granted('ROLE_ADMIN') %}
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ path('admin_media_index') }}">Admin</a>
-                                </li>
-                            {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('admin_media_index') }}">
+                                    {{ is_granted('ROLE_ADMIN') ? 'Admin' : 'Mes médias' }}
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path('app_logout') }}">Déconnexion</a>
                             </li>

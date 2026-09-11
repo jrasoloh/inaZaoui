@@ -101,5 +101,42 @@ class HomeControllerTest extends AbstractWebTestCase
         self::assertStringContainsString('Sans propriétaire', $text);
         self::assertStringNotContainsString('Photo de Bob', $text);
     }
+
+    public function testNavShowsLoginLinkForAnonymous(): void
+    {
+        $crawler = $this->client->request('GET', '/');
+
+        $nav = $crawler->filter('header nav')->text();
+        self::assertStringContainsString('Connexion', $nav);
+        self::assertStringNotContainsString('Déconnexion', $nav);
+    }
+
+    public function testNavShowsMediaSpaceLinkForGuest(): void
+    {
+        $alice = $this->findUserByEmail(AppFixtures::GUEST_ACTIVE_EMAIL);
+        $this->client->loginUser($alice);
+
+        $crawler = $this->client->request('GET', '/');
+
+        // A logged-in guest gets a link to their own media space...
+        $link = $crawler->selectLink('Mes médias')->link();
+        self::assertStringContainsString('/admin/media', $link->getUri());
+
+        // ...but not the admin-only label.
+        $nav = $crawler->filter('header nav')->text();
+        self::assertStringContainsString('Déconnexion', $nav);
+        self::assertStringNotContainsString('Admin', $nav);
+    }
+
+    public function testNavShowsAdminLinkForAdmin(): void
+    {
+        $admin = $this->findUserByEmail(AppFixtures::ADMIN_EMAIL);
+        $this->client->loginUser($admin);
+
+        $crawler = $this->client->request('GET', '/');
+
+        $link = $crawler->selectLink('Admin')->link();
+        self::assertStringContainsString('/admin/media', $link->getUri());
+    }
 }
 
