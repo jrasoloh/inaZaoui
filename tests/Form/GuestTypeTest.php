@@ -4,22 +4,16 @@ namespace App\Tests\Form;
 
 use App\Entity\User;
 use App\Form\GuestType;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Validator\Validation;
 
 class GuestTypeTest extends TypeTestCase
 {
-    protected function getExtensions(): array
-    {
-        // The form uses validation constraints (plainPassword) so the
-        // ValidatorExtension must be registered on the test factory.
-        $validator = Validation::createValidator();
-
-        return [
-            new ValidatorExtension($validator),
-        ];
-    }
+    // Registers the Validator extension on the test form factory (the form uses
+    // validation constraints, e.g. plainPassword). The parent TypeTestCase adds
+    // it automatically when this trait is present, so no getExtensions() override
+    // is needed — which also avoids the upcoming signature-change deprecation.
+    use ValidatorExtensionTrait;
 
     public function testSubmitValidDataMapsToUser(): void
     {
